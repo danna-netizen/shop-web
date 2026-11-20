@@ -1,0 +1,28 @@
+-- Crea la tabla de textos de interfaz
+create table if not exists public.ui_text (
+  key text primary key,
+  val text not null
+);
+
+alter table public.ui_text enable row level security;
+
+-- Who can read these texts is defined in db/schema.sql (only users who
+-- finished the sign-up wizard). Remove the old open policy if present.
+drop policy if exists "ui_text readable by authenticated" on public.ui_text;
+
+-- Carga los textos (incluye el "Are you sure?")
+insert into public.ui_text (key, val) values
+  ('sure_title',          'Are you sure?'),
+  ('sure_lead_cancel',    'You''re about to cancel order'),
+  ('sure_lead_refund',    'You''re about to request a refund for order'),
+  ('sure_undone',         'This cannot be undone.'),
+  ('reason_label_cancel', 'Please tell us your name and phone number to cancel your order'),
+  ('reason_label_refund', 'Please tell us your name and phone number'),
+  ('reason_ph',           'Write your name to confirm its you'),
+  ('reason_err',          'Please write your full name as sign to confirm you are accepting to cancel or refund your order.'),
+  ('done_cancel_title',   'Order cancelled'),
+  ('done_refund_title',   'Refund requested'),
+  ('done_cancel_msg',     'Your order {id} has been cancelled.'),
+  ('done_refund_msg',     'We received your refund request for order {id}. You''ll hear back within 3–5 business days.'),
+  ('enjoy_purchase_msg',  'enjoy')
+on conflict (key) do update set val = excluded.val;

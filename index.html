@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maison Market</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f2;
+    --surface: #ffffff;
+    --ink: #1f1b16;
+    --muted: #6d655b;
+    --line: #e8e1d6;
+    --accent: #b5532f;
+    --accent-dark: #8f3e20;
+    --ok: #2e7d4f;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Inter", system-ui, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.5; }
+  h1, h2, h3 { font-family: "Playfair Display", Georgia, serif; }
+  button { font: inherit; cursor: pointer; }
+  [hidden] { display: none !important; }
+
+  /* Header */
+  header { position: sticky; top: 0; z-index: 10; background: rgba(250,247,242,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .nav { max-width: 1200px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .logo { font-family: "Playfair Display", serif; font-size: 1.5rem; font-weight: 700; }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 22px; list-style: none; }
+  .nav-links a { color: var(--ink); text-decoration: none; font-weight: 500; font-size: .95rem; }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .user-chip { font-size: .9rem; color: var(--muted); }
+  .btn { border: none; border-radius: 999px; padding: 10px 20px; background: var(--accent); color: #fff; font-weight: 600; transition: background .2s, opacity .2s; }
+  .btn:hover { background: var(--accent-dark); }
+  .btn:disabled { opacity: .6; cursor: wait; }
+  .btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+  .btn-outline:hover { background: var(--ink); color: #fff; }
+  .btn-dark { background: var(--ink); }
+  .btn-dark:hover { background: #000; }
+  .cart-btn { position: relative; }
+  .cart-count { position: absolute; top: -6px; right: -6px; background: var(--accent); color: #fff; font-size: .7rem; border-radius: 999px; padding: 1px 7px; }
+
+  /* Hero */
+  .hero { max-width: 1200px; margin: 0 auto; padding: 70px 20px 50px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; }
+  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1.1; margin-bottom: 18px; }
+  .hero p { color: var(--muted); font-size: 1.1rem; margin-bottom: 28px; max-width: 480px; }
+  .hero-art { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .hero-art div { aspect-ratio: 1; border-radius: var(--radius); display: grid; place-items: center; font-size: 3.5rem; }
+  .lock-note { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; font-size: .88rem; color: var(--muted); }
+
+  /* Member banner (after registration) */
+  .member { max-width: 1200px; margin: 24px auto 0; padding: 0 20px; }
+  .member-box { background: var(--ink); color: #fff; border-radius: 18px; padding: 26px 28px; display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; }
+  .member-box h2 { font-size: 1.7rem; }
+  .member-box p { color: #cfc6ba; font-size: .95rem; }
+  .member-info { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 12px; font-size: .88rem; }
+  .member-info b { display: block; color: #fff; font-size: .95rem; }
+  .member-info span { color: #a89f93; }
+  .perk { background: var(--accent); padding: 4px 12px; border-radius: 999px; font-size: .78rem; font-weight: 600; display: inline-block; margin-bottom: 8px; }
+
+  /* Sections */
+  section { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+  .ship-banner { max-width: 1200px; margin: 0 auto 30px; padding: 14px 20px; display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; font-weight: 500; font-size: .95rem; }
+  .ship-banner span { color: var(--muted); font-weight: 400; }
+  .section-head { display: flex; justify-content: space-between; align-items: end; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+  .section-head h2 { font-size: 2rem; }
+  .section-head p { color: var(--muted); }
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter { border: 1px solid var(--line); background: var(--surface); padding: 8px 16px; border-radius: 999px; font-size: .9rem; }
+  .filter.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .toolbar input, .toolbar select { padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; font: inherit; font-size: .9rem; background: var(--surface); }
+  .toolbar input { flex: 1; min-width: 180px; }
+  .count { color: var(--muted); font-size: .9rem; margin-bottom: 14px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,.08); }
+  .card-img { aspect-ratio: 4/3; display: grid; place-items: center; font-size: 4rem; position: relative; }
+  .badge { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,.9); font-size: .72rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: .05em; }
+  .card-body { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .card-body h3 { font-size: 1.1rem; }
+  .price { font-weight: 600; color: var(--accent); font-size: 1.1rem; }
+  .price small { color: var(--muted); text-decoration: line-through; font-weight: 400; font-size: .85rem; margin-left: 6px; }
+  .price.locked { color: var(--muted); font-weight: 500; font-size: .9rem; }
+  .card-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; }
+  .card-actions .btn { flex: 1; padding: 9px 12px; font-size: .88rem; }
+
+  .cats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .cat { border-radius: var(--radius); padding: 28px 20px; text-align: center; border: 1px solid var(--line); background: var(--surface); cursor: pointer; transition: border-color .2s; }
+  .cat:hover { border-color: var(--accent); }
+  .cat .icon { font-size: 2.6rem; }
+  .cat h3 { margin-top: 8px; font-size: 1.2rem; }
+  .cat p { color: var(--muted); font-size: .88rem; }
+
+  /* Modals */
+  .overlay { position: fixed; inset: 0; background: rgba(20,16,12,.55); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+  .overlay.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 18px; width: 100%; max-width: 460px; padding: 30px; position: relative; max-height: 92vh; overflow-y: auto; }
+  .modal.wide { max-width: 760px; }
+  .modal.xwide { max-width: 980px; }
+  .close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 1.6rem; color: var(--muted); }
+  .modal h2 { font-size: 1.7rem; margin-bottom: 6px; }
+  .modal h3 { font-size: 1.15rem; margin: 18px 0 10px; }
+  .modal .sub { color: var(--muted); margin-bottom: 20px; font-size: .95rem; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-weight: 600; font-size: .85rem; margin-bottom: 6px; }
+  .field input, .field select, .field textarea { width: 100%; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; font: inherit; background: var(--bg); }
+  .field textarea { resize: vertical; min-height: 84px; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  .error { color: #b3261e; font-size: .8rem; margin-top: 4px; display: none; }
+  .field.invalid .error { display: block; }
+  .field.invalid input, .field.invalid select, .field.invalid textarea { border-color: #b3261e; }
+  .conf-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+  .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+  .auth-tab { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px; font-weight: 600; font-size: .9rem; color: var(--muted); }
+  .auth-tab.active { border: 2px solid var(--accent); background: #fdf3ee; color: var(--ink); }
+  .config-banner { background: #fff6e0; border-bottom: 1px solid #f0dca8; color: #7a5b12; text-align: center; padding: 10px 16px; font-size: .88rem; }
+  .config-banner code { background: #f3e6c4; padding: 1px 6px; border-radius: 4px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Sign-up wizard */
+  .wz-progress { margin-bottom: 18px; }
+  .wz-bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .wz-bar span { display: block; height: 100%; width: 12.5%; background: var(--accent); transition: width .3s; }
+  .wz-label { font-size: .8rem; color: var(--muted); margin-top: 6px; font-weight: 600; }
+  .riddle { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 12px; padding: 14px 16px; background: var(--bg); margin-bottom: 14px; }
+  .riddle span { font-size: 1.6rem; }
+  .riddle p { font-family: "Playfair Display", Georgia, serif; font-size: 1.05rem; }
+  .captcha-box { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+  .captcha-box img { width: 200px; height: 70px; border: 1px solid var(--line); border-radius: 10px; background: #f3ede4; }
+  .icon-btn { width: 42px; height: 42px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; font-size: 1.2rem; }
+  .icon-btn:hover { border-color: var(--accent); }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .choice.wide { grid-column: 1 / -1; }
+  .field .choice { display: block; margin: 0; font-weight: 500; position: relative; }
+  .choice input { position: absolute; opacity: 0; pointer-events: none; }
+  .choice span { display: flex; gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: .9rem; cursor: pointer; background: var(--bg); }
+  .choice input:checked + span { border: 2px solid var(--accent); background: #fdf3ee; padding: 9px 11px; }
+  .choice input:focus-visible + span { outline: 2px solid var(--accent); }
+  .field.invalid .choice span { border-color: #b3261e; }
+  .recs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+  .rec { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: .85rem; }
+  .rec .ic { aspect-ratio: 2; display: grid; place-items: center; font-size: 2rem; }
+  .rec b { display: block; padding: 8px 10px; font-weight: 500; }
+  .terms-box { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: var(--bg); margin-bottom: 14px; }
+  .terms-box a { color: var(--accent); font-weight: 600; }
+  .terms-box small { display: block; color: var(--muted); font-size: .78rem; }
+  .field label.check { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; font-size: .9rem; }
+  .field .check input { width: auto; margin-top: 4px; accent-color: var(--accent); }
+  .linkbtn { display: block; margin: 14px auto 0; background: none; border: none; color: var(--muted); font-size: .82rem; text-decoration: underline; }
+  .full { width: 100%; padding: 13px; margin-top: 6px; }
+  .emoji-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
+  .emoji-cell { aspect-ratio: 1.4; font-size: 2.1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); cursor: pointer; }
+  .emoji-cell:hover { border-color: var(--accent); }
+  .emoji-cell.on { border: 2px solid var(--accent); background: #fdf3ee; }
+  .field.invalid .emoji-cell { border-color: #b3261e; }
+  .count-box img { width: 300px; max-width: calc(100% - 52px); height: auto; aspect-ratio: 2; }
+  .wz-section { border-top: 1px dashed var(--line); margin-top: 22px; padding-top: 2px; }
+  #wzDone .note, #wz7 .note, .wz-section .note { background: #fff6e0; border: 1px solid #f0dca8; color: #7a5b12; border-radius: 10px; padding: 10px 12px; font-size: .84rem; margin-bottom: 14px; }
+  .hint { display: block; color: var(--muted); font-size: .78rem; margin-top: 4px; }
+  .counter { display: block; text-align: right; color: var(--muted); font-size: .78rem; margin-top: 4px; }
+  .counter.ok { color: var(--ok); }
+
+  .detail { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .detail .card-img { border-radius: var(--radius); font-size: 6rem; aspect-ratio: 1; }
+  .detail .meta { color: var(--muted); font-size: .92rem; margin: 10px 0 14px; }
+  .detail .price { font-size: 1.6rem; }
+  .qty { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .qty button { background: none; border: none; width: 34px; height: 34px; font-size: 1.1rem; }
+  .qty span { min-width: 28px; text-align: center; font-weight: 600; }
+  .specs { list-style: none; font-size: .88rem; color: var(--muted); margin: 14px 0; }
+  .specs li { padding: 4px 0; }
+
+  .cart-item { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .cart-item .ic { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; font-size: 1.5rem; }
+  .cart-item .nm { font-weight: 500; font-size: .95rem; }
+  .cart-item .rm { background: none; border: none; color: var(--accent); font-size: .8rem; }
+  .totals { margin: 16px 0; font-size: .95rem; }
+  .totals div { display: flex; justify-content: space-between; padding: 4px 0; }
+  .totals .grand { font-weight: 700; font-size: 1.15rem; border-top: 1px solid var(--line); margin-top: 6px; padding-top: 10px; }
+  .free-ship { font-size: .82rem; color: var(--ok); }
+
+  /* Checkout */
+  .checkout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; }
+  .summary { background: var(--bg); border-radius: var(--radius); padding: 20px; align-self: start; position: sticky; top: 0; }
+  .summary .cart-item { padding: 8px 0; }
+  .steps { display: flex; gap: 8px; margin-bottom: 18px; font-size: .82rem; }
+  .steps span { padding: 4px 12px; border-radius: 999px; background: var(--bg); color: var(--muted); }
+  .steps span.on { background: var(--ink); color: #fff; }
+  .pay-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .pay-tab { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 12px 6px; font-size: .82rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .pay-tab .i { font-size: 1.4rem; }
+  .pay-tab.active { border: 2px solid var(--accent); background: #fdf3ee; }
+  .pay-panel { border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+
+  .credit-card { width: 100%; max-width: 340px; aspect-ratio: 1.6; border-radius: 16px; padding: 20px; color: #fff; margin: 0 auto 18px; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(135deg, #2b2620, #6b4a35); box-shadow: 0 10px 24px rgba(0,0,0,.2); font-family: "Courier New", monospace; transition: background .3s; }
+  .credit-card.visa { background: linear-gradient(135deg, #1a2a6c, #3a5bbf); }
+  .credit-card.mastercard { background: linear-gradient(135deg, #3a1c1c, #c0392b); }
+  .credit-card.amex { background: linear-gradient(135deg, #0f4c4c, #2a9d8f); }
+  .cc-top { display: flex; justify-content: space-between; align-items: center; }
+  .chip { width: 40px; height: 30px; border-radius: 6px; background: linear-gradient(135deg, #e8c66a, #b8923a); }
+  .cc-brand { font-family: "Inter", sans-serif; font-weight: 700; font-style: italic; font-size: 1.1rem; }
+  .cc-num { font-size: 1.25rem; letter-spacing: .12em; }
+  .cc-bottom { display: flex; justify-content: space-between; font-size: .8rem; text-transform: uppercase; }
+  .cc-bottom small { display: block; font-size: .6rem; opacity: .7; }
+
+  .secure { font-size: .8rem; color: var(--muted); text-align: center; margin-top: 10px; }
+  .secure-pay { display: flex; align-items: center; gap: 12px; background: #edf6ef; border: 1px solid #c3e2cd; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; }
+  .secure-pay .lk { font-size: 1.6rem; }
+  .secure-pay b { display: block; color: var(--ok); font-size: 1rem; }
+  .secure-pay span { color: var(--muted); font-size: .82rem; }
+  .trust { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: .78rem; color: var(--muted); }
+  .trust span { display: inline-flex; align-items: center; gap: 5px; }
+  .spinner { width: 46px; height: 46px; border: 4px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 30px auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .success { text-align: center; padding: 10px 0; }
+  .success .check { width: 70px; height: 70px; border-radius: 50%; background: var(--ok); color: #fff; font-size: 2.2rem; display: grid; place-items: center; margin: 0 auto 14px; }
+  .receipt { text-align: left; background: var(--bg); border-radius: var(--radius); padding: 18px; margin: 18px 0; font-size: .9rem; }
+  .receipt div { display: flex; justify-content: space-between; padding: 3px 0; }
+
+  .order { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; font-size: .9rem; }
+  .order-head { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px; }
+  .status { color: var(--ok); font-size: .8rem; font-weight: 600; }
+
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 999px; transition: transform .3s; z-index: 60; font-size: .92rem; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  footer { border-top: 1px solid var(--line); text-align: center; padding: 30px 20px; color: var(--muted); font-size: .88rem; margin-top: 40px; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 40px; }
+    .cats { grid-template-columns: repeat(2, 1fr); }
+    .nav-links { display: none; }
+    .detail, .checkout, .member-box { grid-template-columns: 1fr; }
+    .pay-tabs { grid-template-columns: repeat(2, 1fr); }
+    .summary { position: static; }
+  }
+  @media (max-width: 480px) {
+    .nav-right .btn { padding: 8px 12px; font-size: .82rem; }
+    .user-chip { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="logo">Maison<span>.</span>Market</div>
+    <div class="nav-right">
+      <button class="btn btn-outline" id="ordersBtn">My orders</button>
+      <button class="btn btn-dark cart-btn" id="cartBtn">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
+    </div>
+  </nav>
+</header>
+
+<div class="hero" id="hero">
+  <div>
+    <h1>Curated goods for everyday living.</h1>
+    <p>Discover 113 handpicked pieces from independent makers: clothing, unique home objects, timeless shoes and original paintings.</p>
+    <button class="btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Start shopping</button>
+  </div>
+  <div class="hero-art">
+    <div style="background:#f1dccf">👗</div>
+    <div style="background:#dde5d8">🏺</div>
+    <div style="background:#d9dfe8">👟</div>
+    <div style="background:#efe3c4">🖼️</div>
+  </div>
+</div>
+
+<div class="ship-banner" id="shipBanner">
+  <div>🚚 Domestic shipping available</div>
+  <div>🌍 International shipping available</div>
+  <div><span>All prices in USD</span></div>
+</div>
+
+<section id="shop">
+  <div class="section-head">
+    <div>
+      <h2>All products</h2>
+      <p>New arrivals this season</p>
+    </div>
+  </div>
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search products…">
+    <select id="sort">
+      <option value="featured">Sort: Featured</option>
+      <option value="low">Price: low to high</option>
+      <option value="high">Price: high to low</option>
+      <option value="name">Name: A–Z</option>
+    </select>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<footer>© 2026 Maison Market · International delivery available · Cash on delivery accepted in Canada, USA and Mexico</footer>
+
+<!-- Product detail -->
+<div class="overlay" id="detailOverlay">
+  <div class="modal wide">
+    <button class="close" data-close>&times;</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- Cart -->
+<div class="overlay" id="cartOverlay">
+  <div class="modal">
+    <button class="close" data-close>&times;</button>
+    <h2>Your cart</h2>
+    <div id="cartContent"></div>
+  </div>
+</div>
+
+<!-- Checkout / payment -->
+<div class="overlay" id="checkoutOverlay">
+  <div class="modal xwide">
+    <button class="close" data-close>&times;</button>
+    <div id="checkoutContent"></div>
+  </div>
+</div>
+
+<!-- Orders -->
+<div class="overlay" id="ordersOverlay">
+  <div class="modal wide">
+    <button class="close" data-close>&times;</button>
+    <h2>My orders</h2>
+    <p class="sub">Your purchase history.</p>
+    <div id="ordersContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- Catalog ----------
+const PRODUCTS = [
+  { id: 1, cat: "clothing", name: "Linen Summer Shirt", base: 49, icon: "👕", bg: "#f1dccf", desc: "Breathable 100% linen shirt with a relaxed fit.", sale: false },
+  { id: 2, cat: "clothing", name: "Wool Overcoat", base: 189, icon: "🧥", bg: "#e6ddd2", desc: "Classic double-breasted coat in a soft wool blend.", sale: true },
+  { id: 3, cat: "clothing", name: "Floral Midi Dress", base: 79, icon: "👗", bg: "#f3d9e0", desc: "Flowy midi dress with a hand-drawn floral print.", sale: false },
+  { id: 4, cat: "clothing", name: "Slim Fit Jeans", base: 65, icon: "👖", bg: "#d6dfeb", desc: "Stretch denim jeans in a dark indigo wash.", sale: false },
+  { id: 5, cat: "clothing", name: "Cashmere Scarf", base: 55, icon: "🧣", bg: "#efd9d0", desc: "Ultra-soft cashmere scarf, 180 cm long.", sale: false },
+  { id: 6, cat: "clothing", name: "Oxford Dress Shirt", base: 59, icon: "👔", bg: "#dde6ef", desc: "Crisp cotton oxford shirt with button-down collar.", sale: false },
+  { id: 7, cat: "clothing", name: "Chino Shorts", base: 39, icon: "🩳", bg: "#e9e1cc", desc: "Lightweight cotton shorts with a 7-inch inseam.", sale: true },
+  { id: 8, cat: "clothing", name: "Silk Blouse", base: 89, icon: "👚", bg: "#f4e1e8", desc: "Elegant silk blouse with mother-of-pearl buttons.", sale: false },
+  { id: 9, cat: "clothing", name: "Lab-Style Trench", base: 149, icon: "🥼", bg: "#ecebe6", desc: "Water-resistant trench coat with a belted waist.", sale: false },
+  { id: 10, cat: "clothing", name: "Leather Gloves", base: 45, icon: "🧤", bg: "#e2d3c3", desc: "Lambskin gloves with a warm fleece lining.", sale: false },
+  { id: 11, cat: "clothing", name: "Running Tank Top", base: 29, icon: "🎽", bg: "#d8ebe2", desc: "Quick-dry tank top for training days.", sale: false },
+  { id: 12, cat: "clothing", name: "One-Piece Swimsuit", base: 69, icon: "🩱", bg: "#d5e8ef", desc: "UV-protective swimsuit with a scoop back.", sale: false },
+  { id: 13, cat: "clothing", name: "Baseball Cap", base: 25, icon: "🧢", bg: "#dfe3ea", desc: "Organic cotton cap with adjustable strap.", sale: false },
+  { id: 14, cat: "clothing", name: "Kimono Robe", base: 99, icon: "👘", bg: "#f2dfd3", desc: "Printed cotton kimono robe, one size.", sale: false },
+  { id: 15, cat: "clothing", name: "Hooded Sweatshirt", base: 59, icon: "🧥", bg: "#e3e0dc", desc: "Heavyweight fleece hoodie with kangaroo pocket.", sale: true },
+  { id: 16, cat: "clothing", name: "Pleated Skirt", base: 54, icon: "👗", bg: "#ead9e6", desc: "Midi pleated skirt in a satin finish.", sale: false },
+  { id: 17, cat: "clothing", name: "Denim Jacket", base: 85, icon: "🧥", bg: "#d4dde9", desc: "Classic trucker jacket in rigid denim.", sale: false },
+  { id: 18, cat: "clothing", name: "Knit Sweater", base: 75, icon: "👚", bg: "#efe4d4", desc: "Chunky merino wool sweater, crew neck.", sale: false },
+  { id: 19, cat: "clothing", name: "Wide-Leg Trousers", base: 69, icon: "👖", bg: "#e5e1d8", desc: "Tailored high-waist trousers with pleats.", sale: false },
+  { id: 20, cat: "clothing", name: "Graphic Tee", base: 22, icon: "👕", bg: "#f0e6cf", desc: "Soft cotton tee with an original print.", sale: false },
+  { id: 21, cat: "objects", name: "Ceramic Vase", base: 39, icon: "🏺", bg: "#dde5d8", desc: "Handmade stoneware vase with a matte glaze.", sale: false },
+  { id: 22, cat: "objects", name: "Soy Wax Candle Set", base: 29, icon: "🕯️", bg: "#f2ead8", desc: "Three scented candles: cedar, vanilla and fig.", sale: true },
+  { id: 23, cat: "objects", name: "Brass Desk Clock", base: 65, icon: "🕰️", bg: "#efe3c4", desc: "Vintage-inspired clock with silent quartz movement.", sale: false },
+  { id: 24, cat: "objects", name: "Potted Monstera", base: 49, icon: "🪴", bg: "#d7e7d4", desc: "Live indoor plant in a terracotta pot.", sale: false },
+  { id: 25, cat: "objects", name: "Coffee Table Book", base: 35, icon: "📚", bg: "#e7dfd4", desc: "Hardcover photo book on modern architecture.", sale: false },
+  { id: 26, cat: "objects", name: "Fountain Pen", base: 79, icon: "🖋️", bg: "#dcdde6", desc: "Lacquered fountain pen with a steel nib.", sale: false },
+  { id: 27, cat: "objects", name: "Round Wall Mirror", base: 120, icon: "🪞", bg: "#e9e4dc", desc: "60 cm mirror with a thin brass frame.", sale: false },
+  { id: 28, cat: "objects", name: "Velvet Cushion", base: 32, icon: "🛋️", bg: "#e8d6d6", desc: "Plush velvet cushion with feather insert.", sale: true },
+  { id: 29, cat: "objects", name: "Table Lamp", base: 89, icon: "💡", bg: "#f3ebd2", desc: "Ceramic base lamp with a linen shade.", sale: false },
+  { id: 30, cat: "objects", name: "Teddy Bear", base: 28, icon: "🧸", bg: "#efdfcc", desc: "Hand-stitched plush bear, 30 cm tall.", sale: false },
+  { id: 31, cat: "objects", name: "Gift Box Set", base: 45, icon: "🎁", bg: "#f1d9d9", desc: "Curated box with tea, chocolate and a candle.", sale: false },
+  { id: 32, cat: "objects", name: "Oil Diffuser Lamp", base: 38, icon: "🪔", bg: "#f2e2cf", desc: "Ceramic aroma diffuser with tea-light holder.", sale: false },
+  { id: 33, cat: "objects", name: "Woven Basket", base: 34, icon: "🧺", bg: "#ede3cd", desc: "Hand-woven seagrass storage basket.", sale: false },
+  { id: 34, cat: "objects", name: "Cast Iron Teapot", base: 59, icon: "🫖", bg: "#dcdcd8", desc: "Japanese-style teapot with infuser.", sale: false },
+  { id: 35, cat: "objects", name: "Stoneware Mug Set", base: 36, icon: "☕", bg: "#e6ddd3", desc: "Set of four speckled mugs, 350 ml.", sale: false },
+  { id: 36, cat: "objects", name: "Wind Chime", base: 24, icon: "🎐", bg: "#dde9ee", desc: "Glass wind chime with a soft, clear tone.", sale: false },
+  { id: 37, cat: "objects", name: "Oak Side Chair", base: 179, icon: "🪑", bg: "#e7dccb", desc: "Solid oak chair with a woven seat.", sale: false },
+  { id: 38, cat: "objects", name: "Brass Telescope", base: 210, icon: "🔭", bg: "#e9e0c9", desc: "Decorative working telescope with tripod.", sale: true },
+  { id: 39, cat: "objects", name: "Retro Radio", base: 95, icon: "📻", bg: "#ead8c8", desc: "Bluetooth speaker in a vintage radio case.", sale: false },
+  { id: 40, cat: "objects", name: "Wooden Board Game", base: 42, icon: "🎲", bg: "#e6dbc9", desc: "Handcrafted walnut board game set.", sale: false },
+  { id: 41, cat: "shoes", name: "Everyday Sneakers", base: 95, icon: "👟", bg: "#d9dfe8", desc: "Lightweight sneakers with a cushioned sole.", sale: false },
+  { id: 42, cat: "shoes", name: "Leather Ankle Boots", base: 159, icon: "🥾", bg: "#e4d6c8", desc: "Full-grain leather boots with rubber sole.", sale: false },
+  { id: 43, cat: "shoes", name: "Classic Heels", base: 120, icon: "👠", bg: "#f0d4d4", desc: "Elegant 7 cm suede heels with padded insole.", sale: false },
+  { id: 44, cat: "shoes", name: "Oxford Brogues", base: 140, icon: "👞", bg: "#e3d5c6", desc: "Hand-burnished leather brogues.", sale: false },
+  { id: 45, cat: "shoes", name: "Strappy Sandals", base: 65, icon: "👡", bg: "#f2e1d1", desc: "Leather sandals with an adjustable ankle strap.", sale: true },
+  { id: 46, cat: "shoes", name: "Beach Flip-Flops", base: 19, icon: "🩴", bg: "#d8e9ec", desc: "Comfortable rubber flip-flops.", sale: false },
+  { id: 47, cat: "shoes", name: "Ballet Flats", base: 75, icon: "🥿", bg: "#ecdde3", desc: "Soft leather flats with a bow detail.", sale: false },
+  { id: 48, cat: "shoes", name: "Dance Pointe Shoes", base: 85, icon: "🩰", bg: "#f4dfe4", desc: "Satin pointe shoes for ballet practice.", sale: false },
+  { id: 49, cat: "shoes", name: "Ice Skates", base: 130, icon: "⛸️", bg: "#dfe8f0", desc: "Figure skates with stainless steel blades.", sale: false },
+  { id: 50, cat: "shoes", name: "Trail Running Shoes", base: 115, icon: "👟", bg: "#dbe7da", desc: "Grippy outsole built for off-road runs.", sale: false },
+  { id: 51, cat: "shoes", name: "Hiking Boots", base: 175, icon: "🥾", bg: "#e0d8c9", desc: "Waterproof boots with ankle support.", sale: true },
+  { id: 52, cat: "shoes", name: "Loafers", base: 110, icon: "👞", bg: "#e6d9cc", desc: "Slip-on penny loafers in polished leather.", sale: false },
+  { id: 53, cat: "shoes", name: "Platform Sandals", base: 72, icon: "👡", bg: "#f1e3d6", desc: "Cork platform sandals with a comfy footbed.", sale: false },
+  { id: 54, cat: "shoes", name: "High-Top Sneakers", base: 89, icon: "👟", bg: "#e1e1ea", desc: "Canvas high-tops with a vulcanized sole.", sale: false },
+  { id: 55, cat: "shoes", name: "Stiletto Pumps", base: 135, icon: "👠", bg: "#efd6dc", desc: "Patent leather pumps with a 10 cm heel.", sale: false },
+  { id: 56, cat: "shoes", name: "House Slippers", base: 29, icon: "🥿", bg: "#ece6dc", desc: "Wool-lined slippers with memory foam.", sale: false },
+  { id: 57, cat: "shoes", name: "Chelsea Boots", base: 165, icon: "🥾", bg: "#ddd4c9", desc: "Suede Chelsea boots with elastic sides.", sale: false },
+  { id: 58, cat: "shoes", name: "Slide Sandals", base: 35, icon: "🩴", bg: "#d9e6ea", desc: "Minimal slides with a molded footbed.", sale: true },
+  { id: 59, cat: "shoes", name: "Derby Shoes", base: 125, icon: "👞", bg: "#e4d8ca", desc: "Smart derby shoes with leather sole.", sale: false },
+  { id: 60, cat: "shoes", name: "Kids' Sneakers", base: 45, icon: "👟", bg: "#e8e3d2", desc: "Velcro sneakers with light-up soles.", sale: false },
+  { id: 61, cat: "paintings", name: "Sunset Over the Bay", base: 340, icon: "🌅", bg: "#f6dcc4", desc: "Acrylic on canvas, 60×80 cm. Signed.", sale: false },
+  { id: 62, cat: "paintings", name: "Abstract Blue No. 7", base: 280, icon: "🎨", bg: "#d6e2f0", desc: "Bold abstract oil painting, 50×70 cm.", sale: false },
+  { id: 63, cat: "paintings", name: "Mountain Landscape", base: 410, icon: "🏞️", bg: "#d8e6dc", desc: "Watercolor in a handmade oak frame, 40×50 cm.", sale: false },
+  { id: 64, cat: "paintings", name: "Morning Hills", base: 260, icon: "🌄", bg: "#f2e0cf", desc: "Oil on linen, soft dawn palette, 45×60 cm.", sale: false },
+  { id: 65, cat: "paintings", name: "The Great Wave Study", base: 390, icon: "🌊", bg: "#d4e4ee", desc: "Expressive seascape in acrylic, 70×90 cm.", sale: true },
+  { id: 66, cat: "paintings", name: "Sunflowers in a Jar", base: 220, icon: "🌻", bg: "#f3e8c6", desc: "Still life in oil pastel, 40×50 cm.", sale: false },
+  { id: 67, cat: "paintings", name: "Night Sky Galaxy", base: 450, icon: "🌌", bg: "#d6d6ea", desc: "Mixed media with metallic paint, 80×100 cm.", sale: false },
+  { id: 68, cat: "paintings", name: "City Skyline", base: 310, icon: "🏙️", bg: "#dfe2e8", desc: "Urban scene in gouache, 50×70 cm.", sale: false },
+  { id: 69, cat: "paintings", name: "Cherry Blossoms", base: 275, icon: "🌸", bg: "#f5dde6", desc: "Ink and watercolor on rice paper.", sale: false },
+  { id: 70, cat: "paintings", name: "Autumn Leaves", base: 195, icon: "🍂", bg: "#f1dcc6", desc: "Textured palette-knife painting, 40×40 cm.", sale: true },
+  { id: 71, cat: "paintings", name: "Midnight Streets", base: 330, icon: "🌃", bg: "#d9dbe6", desc: "Moody nocturne in oil, 60×80 cm.", sale: false },
+  { id: 72, cat: "paintings", name: "Snowy Peak", base: 360, icon: "🗻", bg: "#e2e9ef", desc: "Minimalist landscape in acrylic, 50×70 cm.", sale: false },
+  { id: 73, cat: "paintings", name: "Tulip Field", base: 240, icon: "🌷", bg: "#f3dee0", desc: "Impressionist oil painting, 45×60 cm.", sale: false },
+  { id: 74, cat: "paintings", name: "Wild Horse", base: 420, icon: "🐎", bg: "#ece0d1", desc: "Dynamic charcoal and oil, 70×90 cm.", sale: false },
+  { id: 75, cat: "paintings", name: "Crescent Moon", base: 180, icon: "🌙", bg: "#dcdbe9", desc: "Small abstract piece, 30×40 cm.", sale: false },
+  { id: 76, cat: "paintings", name: "Tropical Island", base: 300, icon: "🏝️", bg: "#d5ece6", desc: "Vibrant acrylic seascape, 60×80 cm.", sale: false },
+  { id: 77, cat: "paintings", name: "Pine Forest", base: 255, icon: "🌲", bg: "#d7e5d6", desc: "Oil on board with deep greens, 50×60 cm.", sale: false },
+  { id: 78, cat: "paintings", name: "Butterfly Garden", base: 230, icon: "🦋", bg: "#e5e0f0", desc: "Colorful mixed media, 40×50 cm.", sale: true },
+  { id: 79, cat: "paintings", name: "Still Life with Apples", base: 210, icon: "🍎", bg: "#f2d9d3", desc: "Classic oil still life, 40×50 cm.", sale: false },
+  { id: 80, cat: "paintings", name: "Portrait in Gold", base: 520, icon: "🖼️", bg: "#efe3c4", desc: "Gilded oil portrait in an ornate frame.", sale: false },
+  { id: 82, cat: "chips", name: "BBQ Potato Chips", base: 3.75, icon: "🍟", bg: "#f2d9bd", desc: "Smoky barbecue flavor on crispy golden chips. 150 g bag.", sale: false },
+  { id: 83, cat: "chips", name: "Sour Cream & Onion Chips", base: 3.75, icon: "🥔", bg: "#e8eed6", desc: "Tangy sour cream and onion seasoning. 150 g bag.", sale: false },
+  { id: 84, cat: "chips", name: "Spicy Jalapeño Chips", base: 3.99, icon: "🌶️", bg: "#f3d5cc", desc: "Crunchy chips with a bold jalapeño kick. 150 g bag.", sale: false },
+  { id: 85, cat: "chips", name: "Corn Tortilla Chips", base: 4.25, icon: "🌽", bg: "#f1e3b5", desc: "Stone-ground corn tortilla chips, great for dipping. 250 g bag.", sale: false },
+  { id: 86, cat: "chips", name: "Kettle-Cooked Sea Salt Chips", base: 4.5, icon: "🍟", bg: "#efe1c0", desc: "Thick-cut, slow kettle-cooked chips with flaky sea salt. 180 g bag.", sale: false },
+  { id: 87, cat: "forks", name: "Stainless Steel Dinner Forks", base: 18, icon: "🍴", bg: "#dfe3ea", desc: "Set of 6 polished stainless steel dinner forks.", sale: false },
+  { id: 88, cat: "forks", name: "Gold-Finish Salad Forks", base: 24, icon: "🍴", bg: "#efe3c4", desc: "Set of 6 elegant gold-finish salad forks.", sale: false },
+  { id: 89, cat: "forks", name: "Wooden Serving Fork", base: 9, icon: "🍴", bg: "#e6d6c2", desc: "Hand-carved beechwood fork for salads and pasta.", sale: false },
+  { id: 90, cat: "forks", name: "Mini Cocktail Forks", base: 12, icon: "🍴", bg: "#e4e8ee", desc: "Set of 12 mini forks for appetizers and tasting plates.", sale: false },
+  { id: 91, cat: "forks", name: "Dessert Fork Set", base: 16, icon: "🍴", bg: "#f1dfe5", desc: "Set of 6 slim dessert forks with a satin finish.", sale: false },
+  { id: 92, cat: "forks", name: "Bamboo Travel Fork Set", base: 11, icon: "🍴", bg: "#dbe8d8", desc: "Reusable bamboo forks, 4 pieces with a carry pouch.", sale: false },
+  { id: 93, cat: "dips", name: "Creamy Ranch Dip", base: 4.75, icon: "🥣", bg: "#efe3c4", desc: "Rich and creamy ranch dip with herbs. 250 g jar.", sale: false },
+  { id: 94, cat: "dips", name: "Fresh Guacamole", base: 5.25, icon: "🥑", bg: "#dce8c8", desc: "Ripe avocado, lime and cilantro. 250 g tub.", sale: false },
+  { id: 95, cat: "dips", name: "Classic Hummus", base: 4.5, icon: "🥣", bg: "#efdcb8", desc: "Smooth chickpea hummus with tahini and olive oil. 250 g tub.", sale: false },
+  { id: 96, cat: "dips", name: "Spicy Tomato Salsa", base: 4.25, icon: "🍅", bg: "#f3d0c6", desc: "Chunky tomato salsa with a medium heat. 300 g jar.", sale: false },
+  { id: 97, cat: "dips", name: "Cheese Queso Dip", base: 5.5, icon: "🧀", bg: "#f5e2a8", desc: "Warm, melty cheddar queso dip. 280 g jar.", sale: false },
+  { id: 98, cat: "dips", name: "Spinach & Artichoke Dip", base: 5.75, icon: "🥬", bg: "#dfe8d2", desc: "Creamy spinach and artichoke dip. 250 g jar.", sale: false },
+  { id: 99, cat: "candles", name: "Vanilla Soy Candles", base: 14, icon: "🕯️", bg: "#f3e6d0", desc: "Hand-poured soy wax candles with a warm vanilla scent. Set of 2.", sale: false },
+  { id: 100, cat: "candles", name: "Lavender Calm Candle", base: 16, icon: "🕯️", bg: "#e6dcef", desc: "Relaxing lavender scent in a glass jar. 40 h burn time.", sale: false },
+  { id: 101, cat: "candles", name: "Cinnamon Spice Candle", base: 15, icon: "🕯️", bg: "#f0d9c4", desc: "Cozy cinnamon and clove aroma. 40 h burn time.", sale: false },
+  { id: 102, cat: "candles", name: "Pillar Candle Set", base: 22, icon: "🕯️", bg: "#efe6d8", desc: "Set of 3 unscented pillar candles in assorted sizes.", sale: false },
+  { id: 103, cat: "candles", name: "Tea Light Candles", base: 8, icon: "🕯️", bg: "#f4ead2", desc: "Pack of 24 long-burning unscented tea lights.", sale: false },
+  { id: 104, cat: "candles", name: "Taper Candle Set", base: 12, icon: "🕯️", bg: "#ead9d2", desc: "Set of 6 classic dripless taper candles, 25 cm.", sale: false },
+  { id: 105, cat: "objects", name: "Cleaner", base: 12.99, icon: "🧽", bg: "#dbe8ef", desc: "Screen and body cleaning kit for Surface Pro tablets: microfiber cloth and gentle spray.", sale: false, detailName: "Surface Pro" },
+  { id: 106, cat: "objects", name: "Surface Pro Microsoft Tablet", base: 899, icon: "💻", bg: "#d9dfe8", desc: "Microsoft Surface Pro 2-in-1 tablet with touchscreen, detachable keyboard support and all-day battery.", sale: false, tech: [["Model","Surface Pro (11th Edition)"],["Processor","Snapdragon X Plus"],["RAM","16 GB"],["Storage","256 GB SSD"],["Display","13\" PixelSense Flow touchscreen, 2880 x 1920, 120 Hz"],["Operating system","Windows 11"],["Battery","Up to 14 hours"],["Weight","895 g"],["Connectivity","Wi-Fi 7, Bluetooth 5.4, 2 x USB-C"]] },
+  { id: 107, cat: "objects", name: "Sunrise Air Pods", base: 79, icon: "🛁", bg: "#e3eef2", desc: "Bathroom AirPods: waterproof wireless earbuds made for the shower and the bath.", sale: false },
+  { id: 108, cat: "objects", name: "Ron Bottle", base: 29.99, icon: "🍾", bg: "#ecd9c0", desc: "Botella de ron añejo, 750 ml. Solo para mayores de edad.", sale: false },
+  { id: 109, cat: "objects", name: "Dron", base: 249, icon: "🚁", bg: "#dde5d8", desc: "Dron plegable con cámara HD, vuelo estable y hasta 25 minutos de batería.", sale: false },
+  { id: 110, cat: "objects", name: "Toilet Paper Roll Ex", base: 5.99, icon: "🧻", bg: "#efece4", desc: "Extra-soft, extra-strong toilet paper roll. Pack of 12.", sale: false },
+  { id: 111, cat: "objects", name: "Rolex", base: 7950, icon: "⌚", bg: "#efe3c4", desc: "Reloj Rolex de acero y oro con correa tipo Oyster y cristal de zafiro.", sale: false },
+  { id: 112, cat: "objects", name: "Botella de Agua", base: 6.99, icon: "💧", bg: "#d9eaf3", desc: "Botella de agua reutilizable de 750 ml, libre de BPA y con tapa hermética.", sale: false },
+  { id: 113, cat: "objects", name: "Chips (for dip)", base: 4.5, icon: "🍟", bg: "#f4e4b0", desc: "Sturdy, thick-cut chips made for dipping. 200 g bag.", sale: false },
+  { id: 114, cat: "objects", name: "Classic Chips", base: 3.5, icon: "🍟", bg: "#f4e4b0", desc: "Our classic crispy chips, lightly salted. 150 g bag.", sale: false }
+];
+function toProduct(r) {
+  return { id: r.id, cat: r.cat, name: r.name, base: r.base,
+    price: r.sale ? +(r.base * 0.9).toFixed(2) : r.base,
+    icon: r.icon, bg: r.bg, desc: r.desc, sale: r.sale, detailName: r.detailName, tech: r.tech };
+}
+let products = PRODUCTS.map(toProduct);
+const byId = id => products.find(p => p.id === id);
+const money = n => "$" + n.toFixed(2) + " USD";
+
+// ---------- State ----------
+function load(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
+let cart = load("mm_cart2", []);  // [{id, qty}]
+let orders = load("mm_orders", []);   // saved in this browser
+let currentFilter = "all";
+let detailQty = 1;
+let payMethod = "card";
+
+const $ = id => document.getElementById(id);
+// Escapes user-entered text before it goes into HTML.
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+
+// Dialog texts
+const UI = {
+  sure_title: "Are you sure?",
+  sure_lead_cancel: "You're about to cancel order",
+  sure_lead_refund: "You're about to request a refund for order",
+  sure_undone: "This cannot be undone.",
+  reason_label_cancel: "Please tell us your name and phone number to cancel your order",
+  reason_label_refund: "Please tell us your name and phone number",
+  reason_ph: "Write your name to confirm it's you",
+  reason_err: "Please write your full name to confirm.",
+  done_cancel_title: "Order cancelled",
+  done_refund_title: "Refund requested",
+  done_cancel_msg: "Your order {id} has been cancelled.",
+  done_refund_msg: "We received your refund request for order {id}. You'll hear back within 3-5 business days.",
+  enjoy_purchase_msg: "Thank you for your purchase!"
+};
+const T = (key) => UI[key] || "";
+
+// ---------- Rendering ----------
+function renderGrid() {
+  const q = $("search").value.trim().toLowerCase();
+  let list = products.filter(p => (currentFilter === "all" || p.cat === currentFilter) && (!q || p.name.toLowerCase().includes(q)));
+  const s = $("sort").value;
+  if (s === "low") list.sort((a, b) => a.price - b.price);
+  if (s === "high") list.sort((a, b) => b.price - a.price);
+  if (s === "name") list.sort((a, b) => a.name.localeCompare(b.name));
+  $("count").textContent = `${list.length} product${list.length === 1 ? "" : "s"}`;
+  $("grid").innerHTML = list.map(p => `
+    <article class="card">
+      <div class="card-img" style="background:${p.bg}">
+        ${p.sale ? `<span class="badge">SALE −10%</span>` : ""}${p.icon}
+      </div>
+      <div class="card-body">
+        <h3>${p.name}</h3>
+        <div class="price">${money(p.price)}${p.sale ? `<small>${money(p.base)}</small>` : ""}</div>
+        <div class="card-actions">
+          <button class="btn btn-outline" data-view="${p.id}">View</button>
+          <button class="btn" data-buy="${p.id}">Add to cart</button>
+        </div>
+      </div>
+    </article>`).join("") || `<p class="sub">No products match your search.</p>`;
+}
+
+function renderHeader() {
+  $("cartCount").textContent = cart.reduce((s, i) => s + i.qty, 0);
+}
+
+function totals() {
+  const subtotal = cart.reduce((s, i) => s + byId(i.id).price * i.qty, 0);
+  const shipping = subtotal === 0 || subtotal >= 100 ? 0 : 9.99;
+  const tax = +(subtotal * 0.08).toFixed(2);
+  return { subtotal, shipping, tax, total: subtotal + shipping + tax };
+}
+
+function totalsHTML() {
+  const t = totals();
+  return `<div class="totals">
+    <div><span>Subtotal</span><span>${money(t.subtotal)}</span></div>
+    <div><span>Shipping</span><span>${t.shipping ? money(t.shipping) : "FREE"}</span></div>
+    <div><span>Tax (8%)</span><span>${money(t.tax)}</span></div>
+    <div class="grand"><span>Total</span><span>${money(t.total)}</span></div>
+    ${t.shipping ? `<div class="free-ship">Add ${money(100 - t.subtotal)} more for free shipping</div>` : ""}
+  </div>`;
+}
+
+function renderCart() {
+  if (!cart.length) {
+    $("cartContent").innerHTML = `<p class="sub" style="margin-top:10px">Your cart is empty.</p>`;
+    return;
+  }
+  $("cartContent").innerHTML = cart.map((it, i) => {
+    const p = byId(it.id);
+    return `<div class="cart-item">
+      <div class="ic" style="background:${p.bg}">${p.icon}</div>
+      <div><div class="nm">${p.name}</div>
+        <div class="qty" style="margin-top:4px"><button data-dec="${i}">−</button><span>${it.qty}</span><button data-inc="${i}">+</button></div>
+      </div>
+      <div style="text-align:right">${money(p.price * it.qty)}<br><button class="rm" data-remove="${i}">Remove</button></div>
+    </div>`;
+  }).join("") + totalsHTML() + `<button class="btn full" id="goCheckout">Proceed to checkout</button>`;
+}
+
+function showDetail(id) {
+  const p = byId(id);
+  detailQty = 1;
+  $("detailContent").innerHTML = `
+    <div class="detail">
+      <div class="card-img" style="background:${p.bg}">${p.icon}</div>
+      <div>
+        ${p.sale ? `<span class="badge" style="position:static">SALE −10%</span>` : ""}
+        <h2 style="margin-top:10px">${p.detailName || p.name}</h2>
+        <div class="price">${money(p.price)}${p.sale ? `<small>${money(p.base)}</small>` : ""}</div>
+        <p class="meta">${p.desc}</p>
+        ${p.tech ? `<ul class="specs">${p.tech.map(([k, v]) => `<li><b>${k}:</b> ${v}</li>`).join("")}</ul>` : ""}
+        <ul class="specs">
+          <li>📦 Ships in 2–4 business days</li>
+          <li>🚚 ${p.price >= 100 ? "Free shipping" : "Free shipping on orders over $100"}</li>
+          <li>↩️ 30-day free returns</li>
+          <li>⭐ ${(4 + (p.id % 10) / 10).toFixed(1)} / 5 · ${20 + p.id * 7} reviews</li>
+        </ul>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="qty"><button id="qMinus">−</button><span id="qVal">1</span><button id="qPlus">+</button></div>
+          <button class="btn" data-addqty="${p.id}" style="flex:1">Add to cart</button>
+        </div>
+        <button class="btn btn-dark full" data-buynow="${p.id}" style="margin-top:10px">Buy now</button>
+      </div>
+    </div>`;
+  open("detailOverlay");
+}
+
+// ---------- Checkout & payment ----------
+function renderCheckout() {
+  const t = totals();
+  $("checkoutContent").innerHTML = `
+    <h2>Secure Payment</h2>
+    <div class="steps"><span>1. Cart</span><span class="on">2. Shipping & payment</span><span>3. Confirmation</span></div>
+    <div class="secure-pay">
+      <span class="lk">🔒</span>
+      <div><b>Secure Payment</b><span>Your details are protected with 256-bit SSL encryption and never shared.</span></div>
+    </div>
+    <div class="checkout">
+      <form id="payForm" novalidate>
+        <h3 style="margin-top:0">Shipping address</h3>
+        <div class="field"><label>Full name</label><input name="shipName" value=""><div class="error">Required.</div></div>
+        <div class="field"><label>Street address</label><input name="street" placeholder="123 Main St, Apt 4"><div class="error">Please enter your street address.</div></div>
+        <div class="row">
+          <div class="field"><label>City</label><input name="shipCity"><div class="error">Required.</div></div>
+          <div class="field"><label>Postal code</label><input name="shipZip"><div class="error">Invalid postal code.</div></div>
+        </div>
+        <div class="field"><label>Phone</label><input name="phone" type="tel" placeholder="+1 555 123 4567"><div class="error">Enter a valid phone number.</div></div>
+
+        <h3>🔒 Secure payment method</h3>
+        <div class="pay-tabs">
+          <button type="button" class="pay-tab" data-method="card"><span class="i">💳</span>Card</button>
+          <button type="button" class="pay-tab" data-method="paypal"><span class="i">🅿️</span>PayPal</button>
+          <button type="button" class="pay-tab" data-method="cash"><span class="i">💵</span>Cash on delivery</button>
+        </div>
+
+        <div class="pay-panel" data-panel="card">
+          <div class="credit-card" id="ccPreview">
+            <div class="cc-top"><div class="chip"></div><div class="cc-brand" id="ccBrand">CARD</div></div>
+            <div class="cc-num" id="ccNum">•••• •••• •••• ••••</div>
+            <div class="cc-bottom">
+              <div><small>Card holder</small><span id="ccName">YOUR NAME</span></div>
+              <div><small>Expires</small><span id="ccExp">MM/YY</span></div>
+            </div>
+          </div>
+          <div class="field"><label>Card number</label><input name="cardNumber" inputmode="numeric" autocomplete="off" placeholder="1234 5678 9012 3456" maxlength="19"><div class="error">Invalid card number.</div></div>
+          <div class="field"><label>Name on card</label><input name="cardName" autocomplete="off" placeholder="As shown on the card"><div class="error">Required.</div></div>
+          <div class="row">
+            <div class="field"><label>Expiry (MM/YY)</label><input name="cardExp" inputmode="numeric" autocomplete="off" placeholder="MM/YY" maxlength="5"><div class="error">Invalid or expired date.</div></div>
+            <div class="field"><label>CVV</label><input name="cardCvv" inputmode="numeric" autocomplete="off" placeholder="123" maxlength="4" type="password"><div class="error">3 or 4 digits.</div></div>
+          </div>
+          <div class="field"><label>Installments</label>
+            <select name="installments">
+              <option value="1">Pay in full — ${money(t.total)}</option>
+              <option value="3">3 months — ${money(t.total / 3)}/mo</option>
+              <option value="6">6 months — ${money(t.total / 6)}/mo</option>
+              <option value="12">12 months — ${money(t.total / 12)}/mo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pay-panel" data-panel="paypal">
+          <p class="sub" style="margin-bottom:12px">You'll confirm the payment with your PayPal account.</p>
+          <div class="field"><label>PayPal email</label><input name="ppEmail" type="email" placeholder="you@example.com"><div class="error">Enter a valid email.</div></div>
+        </div>
+
+        <div class="pay-panel" data-panel="cash">
+          <p class="sub" style="margin:0">Cash on delivery is accepted in Canada, USA and Mexico. Pay in cash when your order arrives. Please have the exact amount ready: <b>${money(t.total)}</b>.</p>
+        </div>
+
+        <button class="btn full" type="submit" id="payBtn">🔒 Pay securely ${money(t.total)}</button>
+        <p class="secure">🔒 Secure payment · 256-bit SSL encryption</p>
+        <div class="trust"><span>🔒 SSL secured</span></div>
+      </form>
+
+      <aside class="summary">
+        <h3 style="margin-top:0">Order summary</h3>
+        ${cart.map(it => { const p = byId(it.id); return `<div class="cart-item">
+          <div class="ic" style="background:${p.bg}">${p.icon}</div>
+          <div class="nm">${p.name}<br><span style="color:var(--muted);font-size:.8rem">Qty ${it.qty}</span></div>
+          <div>${money(p.price * it.qty)}</div></div>`; }).join("")}
+        ${totalsHTML()}
+      </aside>
+    </div>`;
+  setPayMethod(payMethod);
+  bindCardPreview();
+  open("checkoutOverlay");
+}
+
+function setPayMethod(m) {
+  payMethod = m;
+  document.querySelectorAll(".pay-tab").forEach(b => b.classList.toggle("active", b.dataset.method === m));
+  document.querySelectorAll(".pay-panel").forEach(p => p.hidden = p.dataset.panel !== m);
+  const total = money(totals().total);
+  $("payBtn").textContent = { card: `Pay ${total}`, paypal: `Continue with PayPal · ${total}`, cash: "Place order (pay on delivery)" }[m];
+}
+
+function cardBrand(num) {
+  if (/^4/.test(num)) return "visa";
+  if (/^(5[1-5]|2[2-7])/.test(num)) return "mastercard";
+  if (/^3[47]/.test(num)) return "amex";
+  return "";
+}
+function luhn(num) {
+  let sum = 0, dbl = false;
+  for (let i = num.length - 1; i >= 0; i--) {
+    let d = +num[i];
+    if (dbl) { d *= 2; if (d > 9) d -= 9; }
+    sum += d; dbl = !dbl;
+  }
+  return num.length >= 13 && sum % 10 === 0;
+}
+
+function bindCardPreview() {
+  const f = $("payForm");
+  f.cardNumber.addEventListener("input", e => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 16);
+    e.target.value = digits.replace(/(.{4})/g, "$1 ").trim();
+    const brand = cardBrand(digits);
+    $("ccPreview").className = "credit-card " + brand;
+    $("ccBrand").textContent = brand ? brand.toUpperCase() : "CARD";
+    $("ccNum").textContent = (digits + "•".repeat(16 - digits.length)).replace(/(.{4})/g, "$1 ").trim();
+  });
+  f.cardName.addEventListener("input", e => $("ccName").textContent = e.target.value.toUpperCase() || "YOUR NAME");
+  f.cardExp.addEventListener("input", e => {
+    let v = e.target.value.replace(/\D/g, "").slice(0, 4);
+    if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+    e.target.value = v;
+    $("ccExp").textContent = v || "MM/YY";
+  });
+  f.cardCvv.addEventListener("input", e => e.target.value = e.target.value.replace(/\D/g, ""));
+  f.addEventListener("submit", submitPayment);
+}
+
+function validExpiry(v) {
+  const m = v.match(/^(\d{2})\/(\d{2})$/);
+  if (!m) return false;
+  const month = +m[1], year = 2000 + +m[2];
+  if (month < 1 || month > 12) return false;
+  const now = new Date();
+  return year > now.getFullYear() || (year === now.getFullYear() && month >= now.getMonth() + 1);
+}
+
+function submitPayment(e) {
+  e.preventDefault();
+  const f = e.target;
+  const checks = {
+    shipName: f.shipName.value.trim().length >= 2,
+    street: f.street.value.trim().length >= 5,
+    shipCity: f.shipCity.value.trim().length >= 2,
+    shipZip: /^[A-Za-z0-9 -]{4,10}$/.test(f.shipZip.value.trim()),
+    phone: f.phone.value.replace(/\D/g, "").length >= 7,
+  };
+  if (payMethod === "card") {
+    const num = f.cardNumber.value.replace(/\D/g, "");
+    checks.cardNumber = luhn(num);
+    checks.cardName = f.cardName.value.trim().length >= 2;
+    checks.cardExp = validExpiry(f.cardExp.value);
+    checks.cardCvv = /^\d{3,4}$/.test(f.cardCvv.value);
+  }
+  if (payMethod === "paypal") checks.ppEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.ppEmail.value.trim());
+
+  let ok = true;
+  f.querySelectorAll(".field").forEach(el => el.classList.remove("invalid"));
+  for (const k in checks) if (!checks[k]) { f[k].closest(".field").classList.add("invalid"); ok = false; }
+  if (!ok) { f.querySelector(".invalid input")?.focus(); return; }
+
+  const t = totals();
+  const methodLabel = {
+    card: `${(cardBrand(f.cardNumber.value.replace(/\D/g, "")) || "Card").toUpperCase()} •••• ${f.cardNumber.value.slice(-4)}` + (f.installments.value !== "1" ? ` (${f.installments.value} installments)` : ""),
+    paypal: `PayPal (${f.ppEmail.value.trim()})`,
+    cash: "Cash on delivery",
+  }[payMethod];
+  const order = {
+    id: "MM-" + Math.floor(100000 + Math.random() * 900000),
+    date: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+    items: cart.map(it => ({ name: byId(it.id).name, icon: byId(it.id).icon, qty: it.qty, price: byId(it.id).price })),
+    total: t.total,
+    method: methodLabel,
+    address: `${f.street.value.trim()}, ${f.shipCity.value.trim()} ${f.shipZip.value.trim()}`,
+    status: payMethod === "card" || payMethod === "paypal" ? "Paid · Preparing shipment" : "Awaiting payment",
+  };
+
+  // Processing screen, then store the order in this browser.
+  $("checkoutContent").innerHTML = `<div class="spinner"></div><p class="sub" style="text-align:center">Processing your ${payMethod === "card" ? "payment" : "order"}…</p>`;
+  setTimeout(() => {
+    orders.unshift(order);
+    save("mm_orders", orders);
+    cart = []; save("mm_cart2", cart); renderHeader();
+    showConfirmation(order);
+  }, 900);
+}
+
+function showConfirmation(o) {
+  $("checkoutContent").innerHTML = `
+    <div class="steps"><span>1. Cart</span><span>2. Shipping & payment</span><span class="on">3. Confirmation</span></div>
+    <div class="success">
+      <div class="check">✓</div>
+      
+      <h2>${T("enjoy_purchase_msg")}</h2>
+      
+      <p class="sub">Your order <b>${o.id}</b> has been placed.</p>
+      <div class="receipt">
+        ${o.items.map(i => `<div><span>${i.icon} ${i.name} × ${i.qty}</span><span>${money(i.price * i.qty)}</span></div>`).join("")}
+        <div style="border-top:1px solid var(--line);margin-top:8px;padding-top:8px"><b>Total paid</b><b>${money(o.total)}</b></div>
+        <div><span>Payment</span><span>${o.method}</span></div>
+        <div><span>Ship to</span><span>${o.address}</span></div>
+        <div><span>Estimated delivery</span><span>${new Date(Date.now() + 4 * 864e5).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span></div>
+      </div>
+      <div class="review-notice" style="margin:14px 0;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg-soft,#f7f7f7);font-size:14px">
+        <span id="reviewMsg">Take a moment to review your order and prices. If something looks off, you can cancel or request a refund — <b id="reviewTimer">10</b>s</span>
+      </div>
+      <div class="conf-actions">
+        <button class="btn btn-outline" data-request="cancel" data-oid="${o.id}">Cancel order</button>
+        <button class="btn btn-outline" data-request="refund" data-oid="${o.id}">Request a refund</button>
+      </div>
+      <div class="conf-actions" style="margin-top:12px">
+        <button class="btn" data-close>Continue shopping</button>
+        <button class="btn btn-dark" id="seeOrders">View my orders</button>
+      </div>
+    </div>`;
+
+  let left = 10;
+  const timerEl = $("reviewTimer");
+  const msgEl = $("reviewMsg");
+  const tick = setInterval(() => {
+    left -= 1;
+    if (left > 0) {
+      if (timerEl) timerEl.textContent = left;
+    } else {
+      clearInterval(tick);
+      if (msgEl) msgEl.innerHTML = "Everything look right? No action needed. You can still cancel or request a refund anytime below.";
+    }
+  }, 1000);
+}
+
+// ---------- Cancel / refund request ----------
+function renderRequestForm(type, oid) {
+  const o = orders.find(x => x.id === oid);
+  const isCancel = type === "cancel";
+  const title = isCancel ? "Cancel order" : "Request a refund";
+  $("checkoutContent").innerHTML = `
+    <div class="success" style="max-width:460px;margin:0 auto">
+      <div class="check" style="background:${isCancel ? "var(--accent)" : "var(--ink)"}">?</div>
+      <h2>${T("sure_title")}</h2>
+      <p class="sub">${isCancel ? T("sure_lead_cancel") : T("sure_lead_refund")} <b>${oid}</b>${o ? ` (${money(o.total)})` : ""}. ${T("sure_undone")}</p>
+      <form id="requestForm" novalidate style="text-align:left">
+        <div class="field">
+          <label for="reqReason">${isCancel ? T("reason_label_cancel") : T("reason_label_refund")}</label>
+          <textarea id="reqReason" name="reason" placeholder="${T("reason_ph")}"></textarea>
+          <div class="error">${T("reason_err")}</div>
+        </div>
+        <button class="btn full" type="submit">Confirm ${title.toLowerCase()}</button>
+        <button class="btn btn-outline full" type="button" id="backToConf" style="margin-top:8px">Go back</button>
+      </form>
+    </div>`;
+  $("requestForm").addEventListener("submit", ev => {
+    ev.preventDefault();
+    const field = ev.target.querySelector(".field");
+    const reason = ev.target.reason.value.trim();
+    if (reason.length < 3) { field.classList.add("invalid"); ev.target.reason.focus(); return; }
+    if (o) {
+      o.status = isCancel ? "Cancelled by customer" : "Refund requested"; o.reason = reason;
+      save("mm_orders", orders);
+    }
+    $("checkoutContent").innerHTML = `
+      <div class="success">
+        <div class="check">✓</div>
+        <h2>${isCancel ? T("done_cancel_title") : T("done_refund_title")}</h2>
+        <p class="sub">${(isCancel ? T("done_cancel_msg") : T("done_refund_msg")).replace("{id}", `<b>${oid}</b>`)}</p>
+        <div class="conf-actions">
+          <button class="btn" data-close>Continue shopping</button>
+          <button class="btn btn-dark" id="seeOrders">View my orders</button>
+        </div>
+      </div>`;
+  });
+  $("reqReason").addEventListener("input", () => $("requestForm").querySelector(".field").classList.remove("invalid"));
+  $("backToConf").addEventListener("click", () => showConfirmation(o));
+}
+
+function renderOrders() {
+  $("ordersContent").innerHTML = orders.length ? orders.map(o => `
+    <div class="order">
+      <div class="order-head"><span>${o.id}</span><span>${money(o.total)}</span></div>
+      <div style="color:var(--muted);font-size:.82rem">${o.date} · ${o.method}</div>
+      <div style="margin:6px 0">${o.items.map(i => `${i.icon} ${i.name} ×${i.qty}`).join(" · ")}</div>
+      <div class="status">● ${o.status}</div>
+    </div>`).join("") : `<p class="sub">You haven't placed any orders yet.</p>`;
+  open("ordersOverlay");
+}
+
+// ---------- Helpers ----------
+function open(id) {
+  $(id).classList.add("open");
+}
+
+function close(id) { $(id).classList.remove("open"); }
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2400);
+}
+function addToCart(id, qty = 1) {
+  const it = cart.find(i => i.id === id);
+  if (it) it.qty += qty; else cart.push({ id, qty });
+  save("mm_cart2", cart); renderHeader();
+  toast(`${byId(id).name} added to cart`);
+}
+function setFilter(cat) {
+  currentFilter = cat;
+  document.querySelectorAll(".filter").forEach(f => f.classList.toggle("active", f.dataset.cat === cat));
+  renderGrid();
+}
+
+// ---------- Events ----------
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, [data-jump], .overlay") || e.target;
+  if (t.matches("[data-close]") || (t.classList.contains("overlay") && e.target === t)) {
+    (t.closest(".overlay") || t).classList.remove("open");
+    return;
+  }
+  const d = t.dataset || {};
+  if (d.view) showDetail(+d.view);
+  if (d.buy) addToCart(+d.buy);
+  if (d.addqty) { addToCart(+d.addqty, detailQty); close("detailOverlay"); }
+  if (d.buynow) { addToCart(+d.buynow, detailQty); close("detailOverlay"); renderCheckout(); }
+  if (t.id === "qMinus") { detailQty = Math.max(1, detailQty - 1); $("qVal").textContent = detailQty; }
+  if (t.id === "qPlus") { detailQty = Math.min(10, detailQty + 1); $("qVal").textContent = detailQty; }
+  if (d.inc !== undefined) { cart[+d.inc].qty++; save("mm_cart2", cart); renderCart(); renderHeader(); }
+  if (d.dec !== undefined) { const it = cart[+d.dec]; if (it.qty > 1) it.qty--; else cart.splice(+d.dec, 1); save("mm_cart2", cart); renderCart(); renderHeader(); }
+  if (d.remove !== undefined) { cart.splice(+d.remove, 1); save("mm_cart2", cart); renderCart(); renderHeader(); }
+  if (t.id === "goCheckout") { close("cartOverlay"); renderCheckout(); }
+  if (d.method) setPayMethod(d.method);
+  if (d.request) renderRequestForm(d.request, d.oid);
+  if (t.id === "seeOrders") { close("checkoutOverlay"); renderOrders(); }
+  if (d.jump) {
+    e.preventDefault();
+    setFilter(d.jump);
+    $("shop").scrollIntoView({ behavior: "smooth" });
+  }
+  if (t.matches(".filter")) setFilter(d.cat);
+});
+
+$("search").addEventListener("input", renderGrid);
+$("sort").addEventListener("change", renderGrid);
+
+
+$("ordersBtn").addEventListener("click", renderOrders);
+$("cartBtn").addEventListener("click", () => { renderCart(); open("cartOverlay"); });
+
+// ---------- Startup ----------
+renderHeader();
+renderGrid();
+</script>
+</body>
+</html>
