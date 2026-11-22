@@ -661,6 +661,7 @@ function renderCheckout() {
 
         <button class="btn full" type="submit" id="payBtn">🔒 Pay securely ${money(t.total)}</button>
         <p class="secure">🔒 Secure payment · 256-bit SSL encryption</p>
+        ${PAYMENT_BADGE ? `<p class="secure">Payments processed by <b>${PAYMENT_BADGE}</b></p>` : ""}
         <div class="trust"><span>🔒 SSL secured</span></div>
       </form>
 
@@ -728,6 +729,8 @@ function validExpiry(v) {
 // Single place that talks to the payment provider. submitPayment() only calls
 // PAYMENT_PROCESSOR.charge(); swap this object for your provider's SDK/API call
 // (it must resolve to { ok: true, reference } or { ok: false, message }).
+// Name of your payment provider, shown at checkout once payments are really processed through it (e.g. "Stripe").
+const PAYMENT_BADGE = "";
 const PAYMENT_PROCESSOR = {
   async charge({ method, amount, currency, orderId, card, paypalEmail }) {
     await new Promise(r => setTimeout(r, 1800));
