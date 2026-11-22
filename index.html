@@ -192,7 +192,7 @@
   .steps { display: flex; gap: 8px; margin-bottom: 18px; font-size: .82rem; }
   .steps span { padding: 4px 12px; border-radius: 999px; background: var(--bg); color: var(--muted); }
   .steps span.on { background: var(--ink); color: #fff; }
-  .pay-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .pay-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
   .pay-tab { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 12px 6px; font-size: .82rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .pay-tab .i { font-size: 1.4rem; }
   .pay-tab.active { border: 2px solid var(--accent); background: #fdf3ee; }
@@ -320,7 +320,7 @@
 
 <!-- Checkout / payment -->
 <div class="overlay" id="checkoutOverlay">
-  <div class="modal">
+  <div class="modal wide">
     <button class="close" data-close>&times;</button>
     <div id="checkoutContent"></div>
   </div>
@@ -480,6 +480,7 @@ let cart = load("mm_cart2", []);  // [{id, qty}]
 let orders = load("mm_orders", []);   // saved in this browser
 let currentFilter = "all";
 let detailQty = 1;
+let payMethod = "card";
 
 const $ = id => document.getElementById(id);
 // Escapes user-entered text before it goes into HTML.
@@ -598,27 +599,83 @@ function showDetail(id) {
 
 // ---------- Checkout & payment ----------
 function renderCheckout() {
+  const t = totals();
   $("checkoutContent").innerHTML = `
-    <h2>Payment</h2>
-    <form id="payForm" novalidate>
-      <div class="credit-card" id="ccPreview">
-        <div class="cc-top"><div class="chip"></div><div class="cc-brand" id="ccBrand">CARD</div></div>
-        <div class="cc-num" id="ccNum">•••• •••• •••• ••••</div>
-        <div class="cc-bottom">
-          <div><small>Card holder</small><span id="ccName">YOUR NAME</span></div>
-          <div><small>Expires</small><span id="ccExp">MM/YY</span></div>
+    <h2>Secure Payment</h2>
+    <div class="steps"><span>1. Cart</span><span class="on">2. Shipping & payment</span><span>3. Confirmation</span></div>
+    <div class="secure-pay">
+      <span class="lk">🔒</span>
+      <div><b>Secure Payment</b><span>Your details are protected with 256-bit SSL encryption and never shared.</span></div>
+    </div>
+    <div>
+      <form id="payForm" novalidate>
+        <h3 style="margin-top:0">Shipping address</h3>
+        <div class="field"><label>Full name</label><input name="shipName" value=""><div class="error">Required.</div></div>
+        <div class="field"><label>Street address</label><input name="street" placeholder="123 Main St, Apt 4"><div class="error">Please enter your street address.</div></div>
+        <div class="row">
+          <div class="field"><label>City</label><input name="shipCity"><div class="error">Required.</div></div>
+          <div class="field"><label>Postal code</label><input name="shipZip"><div class="error">Invalid postal code.</div></div>
         </div>
-      </div>
-      <div class="field"><label>Card number</label><input name="cardNumber" inputmode="numeric" autocomplete="off" placeholder="1234 5678 9012 3456" maxlength="19"><div class="error">Invalid card number.</div></div>
-      <div class="field"><label>Name on card</label><input name="cardName" autocomplete="off" placeholder="As shown on the card"><div class="error">Required.</div></div>
-      <div class="row">
-        <div class="field"><label>Expiry (MM/YY)</label><input name="cardExp" inputmode="numeric" autocomplete="off" placeholder="MM/YY" maxlength="5"><div class="error">Invalid or expired date.</div></div>
-        <div class="field"><label>CVV</label><input name="cardCvv" inputmode="numeric" autocomplete="off" placeholder="123" maxlength="4" type="password"><div class="error">3 or 4 digits.</div></div>
-      </div>
-      <button class="btn full" type="submit" id="payBtn">Pay</button>
-    </form>`;
+        <div class="field"><label>Phone</label><input name="phone" type="tel" placeholder="+1 555 123 4567"><div class="error">Enter a valid phone number.</div></div>
+
+        <h3>🔒 Secure payment method</h3>
+        <div class="pay-tabs">
+          <button type="button" class="pay-tab" data-method="card"><span class="i">💳</span>Card</button>
+          <button type="button" class="pay-tab" data-method="paypal"><span class="i">🅿️</span>PayPal</button>
+          <button type="button" class="pay-tab" data-method="cash"><span class="i">💵</span>Cash on delivery</button>
+        </div>
+
+        <div class="pay-panel" data-panel="card">
+          <div class="credit-card" id="ccPreview">
+            <div class="cc-top"><div class="chip"></div><div class="cc-brand" id="ccBrand">CARD</div></div>
+            <div class="cc-num" id="ccNum">•••• •••• •••• ••••</div>
+            <div class="cc-bottom">
+              <div><small>Card holder</small><span id="ccName">YOUR NAME</span></div>
+              <div><small>Expires</small><span id="ccExp">MM/YY</span></div>
+            </div>
+          </div>
+          <div class="field"><label>Card number</label><input name="cardNumber" inputmode="numeric" autocomplete="off" placeholder="1234 5678 9012 3456" maxlength="19"><div class="error">Invalid card number.</div></div>
+          <div class="field"><label>Name on card</label><input name="cardName" autocomplete="off" placeholder="As shown on the card"><div class="error">Required.</div></div>
+          <div class="row">
+            <div class="field"><label>Expiry (MM/YY)</label><input name="cardExp" inputmode="numeric" autocomplete="off" placeholder="MM/YY" maxlength="5"><div class="error">Invalid or expired date.</div></div>
+            <div class="field"><label>CVV</label><input name="cardCvv" inputmode="numeric" autocomplete="off" placeholder="123" maxlength="4" type="password"><div class="error">3 or 4 digits.</div></div>
+          </div>
+          <div class="field"><label>Installments</label>
+            <select name="installments">
+              <option value="1">Pay in full — ${money(t.total)}</option>
+              <option value="3">3 months — ${money(t.total / 3)}/mo</option>
+              <option value="6">6 months — ${money(t.total / 6)}/mo</option>
+              <option value="12">12 months — ${money(t.total / 12)}/mo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pay-panel" data-panel="paypal">
+          <p class="sub" style="margin-bottom:12px">You'll confirm the payment with your PayPal account.</p>
+          <div class="field"><label>PayPal email</label><input name="ppEmail" type="email" placeholder="you@example.com"><div class="error">Enter a valid email.</div></div>
+        </div>
+
+        <div class="pay-panel" data-panel="cash">
+          <p class="sub" style="margin:0">Cash on delivery is accepted in Canada, USA and Mexico. Pay in cash when your order arrives. Please have the exact amount ready: <b>${money(t.total)}</b>.</p>
+        </div>
+
+        <button class="btn full" type="submit" id="payBtn">🔒 Pay securely ${money(t.total)}</button>
+        <p class="secure">🔒 Secure payment · 256-bit SSL encryption</p>
+        <div class="trust"><span>🔒 SSL secured</span></div>
+      </form>
+
+    </div>`;
+  setPayMethod(payMethod);
   bindCardPreview();
   open("checkoutOverlay");
+}
+
+function setPayMethod(m) {
+  payMethod = m;
+  document.querySelectorAll(".pay-tab").forEach(b => b.classList.toggle("active", b.dataset.method === m));
+  document.querySelectorAll(".pay-panel").forEach(p => p.hidden = p.dataset.panel !== m);
+  const total = money(totals().total);
+  $("payBtn").textContent = { card: `Pay ${total}`, paypal: `Continue with PayPal · ${total}`, cash: "Place order (pay on delivery)" }[m];
 }
 
 function cardBrand(num) {
@@ -670,28 +727,45 @@ function validExpiry(v) {
 function submitPayment(e) {
   e.preventDefault();
   const f = e.target;
-  const num = f.cardNumber.value.replace(/\D/g, "");
   const checks = {
-    cardNumber: luhn(num),
-    cardName: f.cardName.value.trim().length >= 2,
-    cardExp: validExpiry(f.cardExp.value),
-    cardCvv: /^\d{3,4}$/.test(f.cardCvv.value),
+    shipName: f.shipName.value.trim().length >= 2,
+    street: f.street.value.trim().length >= 5,
+    shipCity: f.shipCity.value.trim().length >= 2,
+    shipZip: /^[A-Za-z0-9 -]{4,10}$/.test(f.shipZip.value.trim()),
+    phone: f.phone.value.replace(/\D/g, "").length >= 7,
   };
+  if (payMethod === "card") {
+    const num = f.cardNumber.value.replace(/\D/g, "");
+    checks.cardNumber = luhn(num);
+    checks.cardName = f.cardName.value.trim().length >= 2;
+    checks.cardExp = validExpiry(f.cardExp.value);
+    checks.cardCvv = /^\d{3,4}$/.test(f.cardCvv.value);
+  }
+  if (payMethod === "paypal") checks.ppEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.ppEmail.value.trim());
+
   let ok = true;
   f.querySelectorAll(".field").forEach(el => el.classList.remove("invalid"));
   for (const k in checks) if (!checks[k]) { f[k].closest(".field").classList.add("invalid"); ok = false; }
   if (!ok) { f.querySelector(".invalid input")?.focus(); return; }
 
+  const t = totals();
+  const methodLabel = {
+    card: `${(cardBrand(f.cardNumber.value.replace(/\D/g, "")) || "Card").toUpperCase()} •••• ${f.cardNumber.value.slice(-4)}` + (f.installments.value !== "1" ? ` (${f.installments.value} installments)` : ""),
+    paypal: `PayPal (${f.ppEmail.value.trim()})`,
+    cash: "Cash on delivery",
+  }[payMethod];
   const order = {
     id: "MM-" + Math.floor(100000 + Math.random() * 900000),
     date: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
     items: cart.map(it => ({ name: byId(it.id).name, icon: byId(it.id).icon, qty: it.qty, price: byId(it.id).price })),
-    total: totals().total,
-    method: `${(cardBrand(num) || "Card").toUpperCase()} •••• ${num.slice(-4)}`,
-    address: "",
-    status: "Completed",
+    total: t.total,
+    method: methodLabel,
+    address: `${f.street.value.trim()}, ${f.shipCity.value.trim()} ${f.shipZip.value.trim()}`,
+    status: payMethod === "card" || payMethod === "paypal" ? "Paid · Preparing shipment" : "Awaiting payment",
   };
-  $("checkoutContent").innerHTML = `<div class="spinner"></div>`;
+
+  // Processing screen, then store the order in this browser.
+  $("checkoutContent").innerHTML = `<div class="spinner"></div><p class="sub" style="text-align:center">Processing your ${payMethod === "card" ? "payment" : "order"}…</p>`;
   setTimeout(() => {
     orders.unshift(order);
     save("mm_orders", orders);
@@ -752,6 +826,7 @@ document.addEventListener("click", e => {
   if (d.dec !== undefined) { const it = cart[+d.dec]; if (it.qty > 1) it.qty--; else cart.splice(+d.dec, 1); save("mm_cart2", cart); renderCart(); renderHeader(); }
   if (d.remove !== undefined) { cart.splice(+d.remove, 1); save("mm_cart2", cart); renderCart(); renderHeader(); }
   if (t.id === "goCheckout") { close("cartOverlay"); renderCheckout(); }
+  if (d.method) setPayMethod(d.method);
   if (t.id === "seeOrders") { close("checkoutOverlay"); renderOrders(); }
   if (d.jump) {
     e.preventDefault();
