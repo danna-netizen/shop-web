@@ -724,6 +724,18 @@ function validExpiry(v) {
   return year > now.getFullYear() || (year === now.getFullYear() && month >= now.getMonth() + 1);
 }
 
+// ---------- Payment processor ----------
+// Single place that talks to the payment provider. submitPayment() only calls
+// PAYMENT_PROCESSOR.charge(); swap this object for your provider's SDK/API call
+// (it must resolve to { ok: true, reference } or { ok: false, message }).
+const PAYMENT_PROCESSOR = {
+  async charge({ method, amount, currency, orderId, card, paypalEmail }) {
+    await new Promise(r => setTimeout(r, 1800));
+    if (method === "cash") return { ok: true, reference: "COD-" + orderId };
+    return { ok: true, reference: "TXN-" + Math.random().toString(36).slice(2, 10).toUpperCase() };
+  }
+};
+
 function submitPayment(e) {
   e.preventDefault();
   const f = e.target;
@@ -764,14 +776,34 @@ function submitPayment(e) {
     status: payMethod === "card" || payMethod === "paypal" ? "Paid · Preparing shipment" : "Awaiting payment",
   };
 
-  // Processing screen, then store the order in this browser.
-  $("checkoutContent").innerHTML = `<div class="spinner"></div><p class="sub" style="text-align:center">Processing your ${payMethod === "card" ? "payment" : "order"}…</p>`;
-  setTimeout(() => {
+  const card = payMethod === "card" ? {
+    number: f.cardNumber.value.replace(/\D/g, ""), name: f.cardName.value.trim(),
+    exp: f.cardExp.value, cvv: f.cardCvv.value,
+    installments: +f.installments.value,
+  } : null;
+  const paypalEmail = payMethod === "paypal" ? f.ppEmail.value.trim() : null;
+
+  $("checkoutContent").innerHTML = `<div class="spinner"></div><p class="sub" id="procMsg" style="text-align:center">Securely contacting your bank…</p>`;
+  const step = setTimeout(() => { const m = $("procMsg"); if (m) m.textContent = payMethod === "cash" ? "Placing your order…" : "Authorizing payment…"; }, 900);
+  (async () => {
+    let result;
+    try {
+      result = await PAYMENT_PROCESSOR.charge({ method: payMethod, amount: order.total, currency: "USD", orderId: order.id, card, paypalEmail });
+    } catch (err) {
+      result = { ok: false, message: "We couldn't reach the payment service. Please try again." };
+    }
+    clearTimeout(step);
+    if (!result || !result.ok) {
+      renderCheckout();
+      toast((result && result.message) || "Payment could not be completed. Please try again.");
+      return;
+    }
+    order.reference = result.reference;
     orders.unshift(order);
     save("mm_orders", orders);
     cart = []; save("mm_cart2", cart); renderHeader();
     $("checkoutContent").innerHTML = `<div class="success"><div class="check">✓</div><h2>Your purchase has been completed</h2></div>`;
-  }, 900);
+  })();
 }
 
 function renderOrders() {
