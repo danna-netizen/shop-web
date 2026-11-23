@@ -262,7 +262,7 @@
 <div class="hero" id="hero">
   <div>
     <h1>Curated goods for everyday living.</h1>
-    <p>Discover 122 handpicked pieces from independent makers: clothing, unique home objects, timeless shoes and original paintings.</p>
+    <p>Discover 125 handpicked pieces from independent makers: clothing, unique home objects, timeless shoes and original paintings.</p>
     <button class="btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Start shopping</button>
   </div>
   <div class="hero-art">
@@ -407,7 +407,6 @@ const PRODUCTS = [
   { id: 64, cat: "paintings", name: "Morning Hills", base: 260, icon: "🌄", bg: "#f2e0cf", desc: "Oil on linen, soft dawn palette, 45×60 cm.", sale: false },
   { id: 65, cat: "paintings", name: "The Great Wave Study", base: 390, icon: "🌊", bg: "#d4e4ee", desc: "Expressive seascape in acrylic, 70×90 cm.", sale: true },
   { id: 66, cat: "paintings", name: "Sunflowers in a Jar", base: 220, icon: "🌻", bg: "#f3e8c6", desc: "Still life in oil pastel, 40×50 cm.", sale: false },
-  { id: 67, cat: "paintings", name: "Night Sky Galaxy", base: 450, icon: "🌌", bg: "#d6d6ea", desc: "Mixed media with metallic paint, 80×100 cm.", sale: false },
   { id: 68, cat: "paintings", name: "City Skyline", base: 310, icon: "🏙️", bg: "#dfe2e8", desc: "Urban scene in gouache, 50×70 cm.", sale: false },
   { id: 69, cat: "paintings", name: "Cherry Blossoms", base: 275, icon: "🌸", bg: "#f5dde6", desc: "Ink and watercolor on rice paper.", sale: false },
   { id: 70, cat: "paintings", name: "Autumn Leaves", base: 195, icon: "🍂", bg: "#f1dcc6", desc: "Textured palette-knife painting, 40×40 cm.", sale: true },
@@ -454,15 +453,19 @@ const PRODUCTS = [
   { id: 114, cat: "objects", name: "Classic Chips", base: 3.5, icon: "🍟", bg: "#f4e4b0", desc: "Our classic crispy chips, lightly salted. 150 g bag.", sale: false },
   { id: 115, cat: "objects", name: "Air Up Pods", base: 14.99, icon: "💧", bg: "#d9eaf3", desc: "Air up pods: flavor pods that add a scent to plain water as you drink, for the air up bottle. Pack of 3.", sale: false },
   { id: 116, cat: "objects", name: "AirPods", base: 179, icon: "🎧", bg: "#eceff3", desc: "Apple AirPods: wireless earbuds from Apple with a charging case, easy pairing and all-day sound.", sale: false },
-  { id: 117, cat: "objects", name: "Galaxy Note", base: 799, icon: "📱", bg: "#dde3ee", desc: "Galaxy Note smartphone with a large display, stylus support and a fast processor.", sale: false },
   { id: 118, cat: "objects", name: "Pad", base: 329, icon: "📋", bg: "#e2e6ec", desc: "10-inch touchscreen tablet pad for reading, streaming and note-taking.", sale: false },
-  { id: 119, cat: "objects", name: "Galaxy Note Pad", base: 7.5, icon: "📓", bg: "#d9d6ea", desc: "Galaxy-themed notebook with a starry cosmos cover and 120 lined pages.", sale: false },
-  { id: 120, cat: "objects", name: "Samsung Galaxy", base: 649, icon: "📱", bg: "#dfe5ef", desc: "Samsung Galaxy smartphone with a bright AMOLED display and a pro-grade camera.", sale: false },
-  { id: 121, cat: "objects", name: "Galaxy", base: 1.5, icon: "🍫", bg: "#ead9c8", desc: "Galaxy: the smooth milk chocolate bar from England. 42 g bar.", sale: false },
+  { id: 120, cat: "objects", name: "Samsung Galaxy", base: 649, icon: "📱", bg: "#dfe5ef", desc: "Samsung Galaxy S25 smartphone: 6.2-inch AMOLED display, 12 GB RAM, 256 GB storage and a 50 MP triple camera.", sale: false },
+  { id: 121, cat: "objects", name: "Galaxy Choco Bar", base: 1.5, icon: "🍫", bg: "#ead9c8", desc: "Galaxy Choco Bar: the smooth milk chocolate bar from England. 42 g bar.", sale: false },
   { id: 122, cat: "objects", name: "Apple Watch", base: 399, icon: "⌚", bg: "#e4e8ee", desc: "Apple Watch smartwatch with health tracking, notifications and fitness features.", sale: false },
   { id: 123, cat: "objects", name: "Apples", base: 3.99, icon: "🍎", bg: "#f2d9d3", desc: "Fresh, crisp red apples. Bag of 6.", sale: false },
   { id: 124, cat: "objects", name: "Watch Batteries", base: 6.5, icon: "🔋", bg: "#efe6d0", desc: "Pack of 5 button-cell watch batteries (SR626SW).", sale: false },
-  { id: 125, cat: "objects", name: "Batteries", base: 8.99, icon: "🔋", bg: "#e6ecd9", desc: "Long-lasting AA alkaline batteries. Pack of 8.", sale: false }
+  { id: 125, cat: "objects", name: "Batteries", base: 8.99, icon: "🔋", bg: "#e6ecd9", desc: "Long-lasting AA alkaline batteries. Pack of 8.", sale: false },
+  { id: 126, cat: "objects", name: "Amazon Fire Stick", base: 49.99, icon: "📺", bg: "#e3e6ee", desc: "Amazon Fire TV Stick 4K Max: streaming stick with Wi-Fi 6E, 16 GB storage and Alexa voice remote.", sale: false },
+  { id: 127, cat: "objects", name: "Fire Sticks", base: 6.99, icon: "🔥", bg: "#f3dccb", desc: "Fire starter sticks for campfires, grills and fireplaces. Box of 24.", sale: false },
+  { id: 128, cat: "objects", name: "Nintendo Switch", base: 299, icon: "🎮", bg: "#f0d9d9", desc: "Nintendo Switch OLED Model: 7-inch OLED screen, 64 GB storage, handheld and TV modes.", sale: false },
+  { id: 129, cat: "objects", name: "Light Switch", base: 7.5, icon: "💡", bg: "#f1ebd2", desc: "Wall light switch, single-pole, white, easy to install. Rated 15 A / 120 V.", sale: false },
+  { id: 130, cat: "objects", name: "Dove", base: 2.5, icon: "🧼", bg: "#e6eef0", desc: "Dove soap: gentle moisturizing beauty bar for soft skin. 100 g bar.", sale: false },
+  { id: 131, cat: "objects", name: "Dove Chocolate", base: 3.25, icon: "🍫", bg: "#e9dcd2", desc: "Dove Chocolate: silky smooth milk chocolate. 43 g bar.", sale: false }
 ];
 function toProduct(r) {
   return { id: r.id, cat: r.cat, name: r.name, base: r.base,
