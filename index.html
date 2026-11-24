@@ -262,7 +262,7 @@
 <div class="hero" id="hero">
   <div>
     <h1>Curated goods for everyday living.</h1>
-    <p>Discover 130 handpicked pieces from independent makers: clothing, unique home objects, timeless shoes and original paintings.</p>
+    <p>Discover 131 handpicked pieces from independent makers: clothing, unique home objects, timeless shoes and original paintings.</p>
     <button class="btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Start shopping</button>
   </div>
   <div class="hero-art">
@@ -457,7 +457,7 @@ const PRODUCTS = [
   { id: 120, cat: "objects", name: "Samsung Galaxy", base: 649, icon: "📱", bg: "#dfe5ef", desc: "Samsung Galaxy S25 smartphone: 6.2-inch AMOLED display, 12 GB RAM, 256 GB storage and a 50 MP triple camera.", sale: false },
   { id: 121, cat: "objects", name: "Galaxy Choco Bar", base: 1.5, icon: "🍫", bg: "#ead9c8", desc: "Galaxy Choco Bar: the smooth milk chocolate bar from England. 42 g bar.", sale: false },
   { id: 122, cat: "objects", name: "Apple Watch", base: 399, icon: "⌚", bg: "#e4e8ee", desc: "Apple Watch smartwatch with health tracking, notifications and fitness features.", sale: false },
-  { id: 123, cat: "objects", name: "Apples", base: 3.99, icon: "🍎", bg: "#f2d9d3", desc: "Fresh, crisp red apples. Bag of 6.", sale: false },
+  { id: 123, cat: "objects", name: "Apple", base: 0.99, icon: "🍎", bg: "#f2d9d3", desc: "A fresh, crisp red apple.", sale: false },
   { id: 124, cat: "objects", name: "Watch Batteries", base: 6.5, icon: "🔋", bg: "#efe6d0", desc: "Pack of 5 button-cell watch batteries (SR626SW).", sale: false },
   { id: 125, cat: "objects", name: "Batteries", base: 8.99, icon: "🔋", bg: "#e6ecd9", desc: "Long-lasting AA alkaline batteries. Pack of 8.", sale: false },
   { id: 126, cat: "objects", name: "Amazon Fire Stick", base: 49.99, icon: "📺", bg: "#e3e6ee", desc: "Amazon Fire TV Stick 4K Max: streaming stick with Wi-Fi 6E, 16 GB storage and Alexa voice remote.", sale: false },
@@ -470,7 +470,8 @@ const PRODUCTS = [
   { id: 133, cat: "objects", name: "Ice", base: 3.49, icon: "🧊", bg: "#dcecf4", desc: "Bagged ice cubes, perfect for drinks and coolers. 2 kg bag.", sale: false },
   { id: 134, cat: "objects", name: "Cream", base: 3.99, icon: "🥛", bg: "#f4efe3", desc: "Fresh heavy whipping cream, great for desserts and coffee. 500 ml carton.", sale: false },
   { id: 135, cat: "objects", name: "Cones", base: 4.25, icon: "🍦", bg: "#f0e0c0", desc: "Crispy wafer cones, empty and ready to fill. Box of 24.", sale: false },
-  { id: 136, cat: "objects", name: "Vanilla Ice Cream", base: 5.49, icon: "🍨", bg: "#f6efdc", desc: "Rich and creamy vanilla ice cream made with real vanilla. 1 L tub.", sale: false }
+  { id: 136, cat: "objects", name: "Vanilla Ice Cream", base: 5.49, icon: "🍨", bg: "#f6efdc", desc: "Rich and creamy vanilla ice cream made with real vanilla. 1 L tub.", sale: false },
+  { id: 137, cat: "objects", name: "Apple Wash", base: 4.75, icon: "🧼", bg: "#e4eedc", desc: "Apple Wash soap: a gentle apple-scented soap for hands and body. 250 ml.", sale: false }
 ];
 function toProduct(r) {
   return { id: r.id, cat: r.cat, name: r.name, base: r.base,
